@@ -14,8 +14,10 @@ import (
 func main() {
 	var format string
 	var appendflg bool
+	var addstdout bool
 	flag.StringVar(&format, "f", "03:04:05", "timestamp format. https://golang.org/src/time/format.go")
 	flag.BoolVar(&appendflg, "a", false, "append flag")
+	flag.BoolVar(&addstdout, "o", false, "add timestamp in stdout")
 
 	flag.Usage = func() {
 		fmt.Fprintf(os.Stderr, "Usage:\n  %s [options] filepath\n\nOptions:\n", os.Args[0])
@@ -66,13 +68,18 @@ func main() {
 			log.Fatal(err)
 		}
 
+		timestamp := time.Now().Format(format)
+		ptime := []byte(fmt.Sprintf("\n[%s] ", timestamp))
+		pbuffer := bytes.Replace(buf, []byte("\n"), ptime, -1)
+
+		if addstdout {
+			buf = pbuffer
+		}
+
 		if _, err = stdout.Write(buf); err != nil {
 			log.Fatal(err)
 		}
 
-		timestamp := time.Now().Format(format)
-		ptime := []byte(fmt.Sprintf("\n[%s]", timestamp))
-		pbuffer := bytes.Replace(buf, []byte("\n"), ptime, -1)
 		if _, err = fo.Write(pbuffer); err != nil {
 			log.Fatal(err)
 		}
