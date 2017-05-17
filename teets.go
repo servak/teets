@@ -15,7 +15,7 @@ func main() {
 	var format string
 	var appendflg bool
 	var addstdout bool
-	flag.StringVar(&format, "f", "03:04:05", "timestamp format. https://golang.org/src/time/format.go")
+	flag.StringVar(&format, "f", "15:04:05", "timestamp format. https://golang.org/src/time/format.go")
 	flag.BoolVar(&appendflg, "a", false, "append flag")
 	flag.BoolVar(&addstdout, "o", false, "add timestamp in stdout")
 
@@ -54,6 +54,9 @@ func main() {
 	r := bufio.NewReader(os.Stdin)
 	buf := make([]byte, 0, 4*1024)
 	stdout := os.Stdout
+
+	timestamp := time.Now().Format(format)
+	fmt.Fprintf(fo, "[%s] ", timestamp)
 
 	for {
 		n, err := r.Read(buf[:cap(buf)])
